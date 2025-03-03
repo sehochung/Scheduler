@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Schedule Bot",
+    "slug": "schedule-bot",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to import images and scan paper schedules.",
+          "cameraPermission": "The app accesses your camera to scan paper schedules."
+        }
+      ]
+    ]
+  }
+}
