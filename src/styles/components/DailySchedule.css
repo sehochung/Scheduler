@@ -18,7 +18,7 @@
 }
 
 .hour-markers {
-  width: 80px; /* Widened for better visibility */
+  width: 90px; /* Widened even more for better visibility */
   position: relative;
   flex-shrink: 0;
   border-right: 1px solid #ccc;
@@ -53,13 +53,13 @@
 }
 
 .full-hour-label {
-  font-size: 12px;
+  font-size: 14px; /* Increased font size */
   font-weight: 500;
   color: #444;
 }
 
 .half-hour-label {
-  font-size: 10px;
+  font-size: 12px; /* Increased font size */
   color: #666;
 }
 
@@ -90,9 +90,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center; /* Center all content horizontally */
   border-left: 4px solid rgba(0, 0, 0, 0.2);
-  z-index: 10; /* Ensure tasks appear above grid lines by default */
-  min-height: 40px; /* Ensure minimum height for small tasks */
+  z-index: 10;
+  min-height: 40px;
 }
 
 .task-block:hover {
@@ -107,20 +108,25 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: 2px;
-  white-space: nowrap; /* Prevent title from wrapping */
-  color: white; /* Ensure text is visible on colored backgrounds */
-  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3); /* Add subtle text shadow for readability */
+  white-space: nowrap;
+  color: white;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
+  text-align: center; /* Center text */
+  width: 100%; /* Ensure full width for centering */
 }
 
 .task-details {
   font-size: 12px;
   opacity: 0.9;
   margin-top: 4px;
-  white-space: nowrap; /* Prevent details from wrapping */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: white; /* Ensure text is visible on colored backgrounds */
-  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2); /* Add subtle text shadow for readability */
+  color: white;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+  text-align: center; /* Center text */
+  width: 100%; /* Ensure full width for centering */
+  font-weight: normal; /* Ensure normal font weight */
 }
 
 /* Compact view for small task blocks */
@@ -132,7 +138,6 @@
 
 .task-compact-content {
   font-size: 12px;
-  font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -140,6 +145,11 @@
   text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
   width: 100%;
   text-align: center;
+}
+
+/* Add styles to handle the non-bold parts in compact view */
+.task-compact-content .task-time-info {
+  font-weight: normal;
 }
 
 /* Hour grid lines */

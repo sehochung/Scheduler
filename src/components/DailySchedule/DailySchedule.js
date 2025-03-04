@@ -5,9 +5,9 @@ import '../../../src/styles/components/DailySchedule.css';
 
 // Constants for timeline calculations - defined outside component for StyleSheet access
 const TOTAL_MINUTES_IN_DAY = 24 * 60; // 24 hours = 1440 minutes
-const PIXELS_PER_HOUR = 60; // 60 pixels per hour
-const MINUTES_PER_HOUR = 60;
-const DEFAULT_MIN_TIMELINE_HEIGHT = 600; // Minimum height when tasks exist
+const PIXELS_PER_HOUR = 180; // 180 pixels per hour (3 pixels per minute)
+const MINUTES_PER_HOUR = 60; // Standard minutes per hour
+const DEFAULT_MIN_TIMELINE_HEIGHT = 1000; // Increased minimum height for better visibility
 const PADDING_HOURS = 2; // Add 2 hours padding before first task and after last task
 
 const DailySchedule = ({ tasks = [] }) => {
@@ -70,13 +70,14 @@ const DailySchedule = ({ tasks = [] }) => {
    * @return {number} Height in pixels
    */
   const getDurationHeight = (durationMinutes) => {
-    if (!durationMinutes || isNaN(durationMinutes)) return 24; // Minimum default height
+    if (!durationMinutes || isNaN(durationMinutes)) return 30; // Minimum default height
     
-    // Linear scaling: 1 minute = 1 pixel
+    // Linear scaling: 3 pixels per minute
     const height = (durationMinutes / MINUTES_PER_HOUR) * PIXELS_PER_HOUR;
     
-    // Round to nearest pixel, minimum height of 24px for visibility
-    return Math.max(Math.round(height), 24);
+    // Round to nearest pixel, minimum height of 30px for visibility
+    // Even a 10-minute task will be 30px tall (visible but proportional)
+    return Math.max(Math.round(height), 30);
   };
   
   /**
@@ -330,7 +331,7 @@ const DailySchedule = ({ tasks = [] }) => {
                       const taskDuration = task.duration ? `${task.duration} min` : 'No duration';
                       
                       // Check if the task block is too small for two lines of text
-                      const isCompactView = height < 50;  // 50px threshold for compact view
+                      const isCompactView = height < 60;  // 60px threshold for compact view (increased for new scale)
 
                       return (
                         <div
@@ -344,9 +345,10 @@ const DailySchedule = ({ tasks = [] }) => {
                           }}
                         >
                           {isCompactView ? (
-                            // Compact view: all info on one line with ellipsis
+                            // Compact view: split the content into bold and normal parts
                             <div className="task-compact-content">
-                              {taskTitle} • {taskStartTime} • {taskDuration}
+                              <span style={{ fontWeight: 'bold' }}>{taskTitle}</span>
+                              <span className="task-time-info"> • {taskStartTime} • {taskDuration}</span>
                             </div>
                           ) : (
                             // Regular view: title and details on separate lines
@@ -430,7 +432,7 @@ const DailySchedule = ({ tasks = [] }) => {
                       const taskDuration = task.duration ? `${task.duration} min` : 'No duration';
                       
                       // Check if the task block is too small for two lines of text
-                      const isCompactView = height < 50;  // 50px threshold for compact view
+                      const isCompactView = height < 60;  // 60px threshold for compact view (increased for new scale)
                       
                       return (
                         <View
@@ -518,7 +520,7 @@ const styles = StyleSheet.create({
   
   // Mobile-specific styles for vertical timeline
   mobileTimeline: {
-    height: 600, // Increased fixed height with scroll
+    height: 1000, // Increased fixed height with scroll to match new larger scale
     marginVertical: 10,
   },
   timelineContent: {
@@ -526,7 +528,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   hourMarkersContainer: {
-    width: 80, // Increased width for better readability
+    width: 90, // Increased width for better readability
     position: 'absolute',
     top: 0,
     left: 0,
@@ -587,7 +589,7 @@ const styles = StyleSheet.create({
   taskBlocksContainer: {
     position: 'absolute',
     top: 0,
-    left: 90, // Offset from hour markers (increased to match wider time column)
+    left: 100, // Offset from hour markers (increased to match wider time column)
     right: 10,
     bottom: 0,
   },
