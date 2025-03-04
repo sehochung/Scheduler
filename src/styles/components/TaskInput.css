@@ -1,0 +1,45 @@
+/* Component-specific styles */
+.time-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #2196F3;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all .2s ease-in-out;
+}
+
+.time-slider input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #1976D2;
+}
+
+.time-slider input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #2196F3;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all .2s ease-in-out;
+}
+
+.time-slider input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: #1976D2;
+}
+
+.time-slider input[type="range"]::-ms-thumb {
+  width: 20px;
+  height: 20px;
+  background: #2196F3;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all .2s ease-in-out;
+}
+
+.time-slider input[type="range"]::-ms-thumb:hover {
+  transform: scale(1.2);
+  background: #1976D2;
+}

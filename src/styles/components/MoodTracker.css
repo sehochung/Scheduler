@@ -1,0 +1,21 @@
+/* MoodTracker component styles */
+.mood-option {
+  transition: transform 0.2s ease;
+}
+
+.mood-option:hover {
+  transform: scale(1.1);
+}
+
+.mood-option:active {
+  transform: scale(0.95);
+}
+
+.mood-tracker-container {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

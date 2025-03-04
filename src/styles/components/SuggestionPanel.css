@@ -1,0 +1,26 @@
+/* SuggestionPanel component styles */
+.suggestion-card {
+  transition: all 0.3s ease;
+}
+
+.suggestion-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-action-button {
+  transition: all 0.2s ease;
+}
+
+.suggestion-action-button:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.suggestion-dismiss {
+  transition: opacity 0.3s ease;
+}
+
+.suggestion-dismiss:hover {
+  opacity: 0.7;
+}

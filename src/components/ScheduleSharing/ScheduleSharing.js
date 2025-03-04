@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import COLORS from '../colors';
+import COLORS from '../../colors';
+import '../../../src/styles/components/ScheduleSharing.css';
+
 
 const ScheduleSharing = ({ schedule = [] }) => {
   const handleShareSchedule = () => {

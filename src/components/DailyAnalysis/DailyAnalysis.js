@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import COLORS from '../colors';
+import COLORS from '../../colors';
+import '../../../src/styles/components/DailyAnalysis.css';
+
 
 const DailyAnalysis = ({ analysis, onAnalyze }) => {
   // If no analysis available yet

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import COLORS from '../colors';
+import COLORS from '../../colors';
+import '../../../src/styles/components/TaskInput.css';
 
 const TaskInput = ({ onAddTask }) => {
   const [title, setTitle] = useState('');
@@ -174,7 +175,9 @@ const TaskInput = ({ onAddTask }) => {
   };
 
   // Update time from sliders
-  const updateTimeFromSliders = (hours, minutes) => {
+  const updateTimeFromSliders = (totalMinutes) => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
     const newTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     setTempTime(newTime);
   };
@@ -322,32 +325,70 @@ const TaskInput = ({ onAddTask }) => {
               {/* Time Picker Mode */}
               {timeInputMode === 'picker' && (
                 <View style={styles.timePickerMode}>
-                  {/* Time Picker based on platform */}
                   {Platform.OS === 'web' ? (
                     <View style={styles.webTimePicker}>
                       <View style={styles.timePickerContent}>
-                        {/* Time Display */}
+                        {/* Time Display with Step Buttons */}
                         <View style={styles.timeDisplayContainer}>
-                          <Text style={styles.timeValue}>
-                            {minutesToTime(timeToMinutes(tempTime))}
-                          </Text>
+                          <View style={styles.timeControlsRow}>
+                            <TouchableOpacity
+                              style={styles.stepButton}
+                              onPress={() => {
+                                const currentMinutes = timeToMinutes(tempTime);
+                                updateTimeFromSlider(Math.max(0, currentMinutes - 1));
+                              }}
+                            >
+                              <Text style={styles.stepButtonText}>−</Text>
+                            </TouchableOpacity>
+                            
+                            <Text style={styles.timeValue}>
+                              {minutesToTime(timeToMinutes(tempTime))}
+                            </Text>
+                            
+                            <TouchableOpacity
+                              style={styles.stepButton}
+                              onPress={() => {
+                                const currentMinutes = timeToMinutes(tempTime);
+                                updateTimeFromSlider(Math.min(1439, currentMinutes + 1));
+                              }}
+                            >
+                              <Text style={styles.stepButtonText}>+</Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
                         
-                        {/* Single Time Slider */}
-                        <View style={styles.timeSliderContainer}>
+                        {/* Time Slider */}
+                        <View style={styles.timeSliderContainer} className="time-slider">
                           <input
                             type="range"
                             min="0"
                             max="1439"
+                            step="1"
                             value={timeToMinutes(tempTime)}
                             onChange={(e) => {
                               updateTimeFromSlider(parseInt(e.target.value));
                             }}
                             style={{
                               width: '100%',
-                              margin: '20px 0',
+                              height: '2px',
+                              WebkitAppearance: 'none',
+                              background: COLORS.secondary,
+                              outline: 'none',
+                              opacity: '0.7',
+                              WebkitTransition: '.2s',
+                              transition: 'opacity .2s',
+                              cursor: 'pointer',
+                              borderRadius: '1px',
+                              margin: '40px 0 8px 0',
                             }}
                           />
+                          
+                          {/* Time Markers */}
+                          <View style={styles.timeMarkers}>
+                            <Text style={styles.timeMarker}>12:00 AM</Text>
+                            <Text style={styles.timeMarker}>12:00 PM</Text>
+                            <Text style={styles.timeMarker}>11:59 PM</Text>
+                          </View>
                         </View>
                       </View>
                     </View>
@@ -613,6 +654,7 @@ const styles = StyleSheet.create({
   },
   timePickerContent: {
     width: '100%',
+    maxWidth: 600,
     alignItems: 'center',
     paddingHorizontal: 20,
   },
@@ -622,15 +664,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
   },
+  timeControlsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15,
+  },
+  stepButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: COLORS.secondaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 12,
+    borderWidth: 1,
+    borderColor: COLORS.secondary,
+  },
+  stepButtonText: {
+    color: COLORS.secondaryDark,
+    fontSize: 16,
+    fontWeight: '500',
+    lineHeight: 16,
+  },
   timeValue: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: 'bold',
     color: COLORS.primary,
+    minWidth: 150,
     textAlign: 'center',
-  },
-  timeSliderContainer: {
-    width: '100%',
-    marginBottom: 20,
   },
   
   // Manual Time Input
@@ -810,6 +872,21 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: COLORS.white,
     fontWeight: 'bold',
+  },
+  timeMarkers: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 2,
+  },
+  timeMarker: {
+    fontSize: 11,
+    color: COLORS.secondaryDark,
+    opacity: 0.7,
+    textAlign: 'center',
+  },
+  timeSliderContainer: {
+    width: '100%',
+    paddingHorizontal: 10,
   },
 });
 

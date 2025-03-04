@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
-import COLORS from '../colors';
+import COLORS from '../../colors';
+import '../../../src/styles/components/Schedule.css';
+
 
 const Schedule = ({ tasks = [] }) => {
   // Group tasks by hour for timeline view

@@ -1,0 +1,26 @@
+/* DailyAnalysis component styles */
+.score-bar {
+  transition: width 1s ease-in-out;
+}
+
+.chart-container {
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  transform: scale(1.02);
+}
+
+.insight-item {
+  transition: background-color 0.3s ease;
+}
+
+.insight-item:hover {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.analyze-button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

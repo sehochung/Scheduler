@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import COLORS from '../colors';
+import COLORS from '../../colors';
+import '../../../src/styles/components/MoodTracker.css';
+
 
 const MoodTracker = ({ onMoodUpdate, tasks = [] }) => {
   const [selectedTask, setSelectedTask] = useState(null);

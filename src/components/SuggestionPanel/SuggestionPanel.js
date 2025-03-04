@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import COLORS from '../colors';
+import COLORS from '../../colors';
+import '../../../src/styles/components/SuggestionPanel.css';
+
 
 const SuggestionPanel = ({ tasks = [] }) => {
   const [suggestions, setSuggestions] = useState([]);

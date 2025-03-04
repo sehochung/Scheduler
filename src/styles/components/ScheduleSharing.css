@@ -1,0 +1,28 @@
+/* ScheduleSharing component styles */
+.share-button {
+  transition: all 0.3s ease;
+}
+
+.share-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.share-option {
+  transition: background-color 0.3s ease;
+}
+
+.share-option:hover {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.copy-notification {
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

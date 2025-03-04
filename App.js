@@ -9,10 +9,13 @@ import {
   TouchableOpacity
 } from 'react-native';
 
+// Import main CSS file
+import './src/styles/index.css';
+
 // Import color theme
 import COLORS from './src/colors';
 
-// Import components one by one
+// Import components from their respective folders
 import Schedule from './src/components/Schedule';
 import TaskInput from './src/components/TaskInput';
 import SuggestionPanel from './src/components/SuggestionPanel';

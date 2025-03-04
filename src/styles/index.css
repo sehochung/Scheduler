@@ -1,0 +1,9 @@
+/* Main stylesheet */
+@import './components/TaskInput.css';
+@import './components/DailyAnalysis.css';
+@import './components/MoodTracker.css';
+@import './components/Schedule.css';
+@import './components/ScheduleSharing.css';
+@import './components/SuggestionPanel.css';
+
+/* Add more imports as needed */
