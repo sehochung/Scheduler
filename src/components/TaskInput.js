@@ -7,7 +7,7 @@ import COLORS from '../colors';
 const TaskInput = ({ onAddTask }) => {
   const [title, setTitle] = useState('');
   const [duration, setDuration] = useState('');
-  const [startTime, setStartTime] = useState('09:00');
+  const [startTime, setStartTime] = useState('');
   const [productivityLevel, setProductivityLevel] = useState('medium');
   const [selectedTags, setSelectedTags] = useState([]);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -15,13 +15,15 @@ const TaskInput = ({ onAddTask }) => {
   const [timeInputText, setTimeInputText] = useState('');
   const [timeInputError, setTimeInputError] = useState('');
   const [showTimeModal, setShowTimeModal] = useState(false);
-  const [tempTime, setTempTime] = useState('09:00');
+  const [tempTime, setTempTime] = useState('');
   const [timeFormat, setTimeFormat] = useState('12h'); // '12h' or '24h'
 
   const availableTags = ['work', 'leisure', 'grind', 'personal', 'meeting', 'health', 'learning'];
   
   // Format time for display (12-hour format with AM/PM)
   function getDisplayTime(timeString) {
+    if (!timeString) return 'Select a time'; // Handle empty time
+    
     const [hours, minutes] = timeString.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
     const displayHour = hours % 12 === 0 ? 12 : hours % 12;
@@ -36,12 +38,16 @@ const TaskInput = ({ onAddTask }) => {
 
   // Get current display time based on format
   function getCurrentDisplayTime() {
+    if (!startTime) {
+      return 'Select a time';
+    }
     return timeFormat === '12h' ? getDisplayTime(startTime) : get24HourDisplayTime(startTime);
   }
 
   // Generate time options in 15-minute intervals
   const generateTimeOptions = () => {
     const options = [];
+    
     for (let hour = 0; hour < 24; hour++) {
       for (let minute = 0; minute < 60; minute += 15) {
         const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
@@ -156,7 +162,8 @@ const TaskInput = ({ onAddTask }) => {
 
   // Open custom time modal
   const openTimeModal = () => {
-    setTempTime(startTime);
+    // Initialize with '00:00' if no time is selected
+    setTempTime(startTime || '00:00');
     setShowTimeModal(true);
   };
 
@@ -166,9 +173,34 @@ const TaskInput = ({ onAddTask }) => {
     setShowTimeModal(false);
   };
 
-  // Update time from time slider inputs
+  // Update time from sliders
   const updateTimeFromSliders = (hours, minutes) => {
-    setTempTime(numbersToTime(hours, minutes));
+    const newTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    setTempTime(newTime);
+  };
+
+  // Helper function to convert minutes since midnight to formatted time
+  const minutesToTime = (totalMinutes) => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHour = hours % 12 === 0 ? 12 : hours % 12;
+    return `${displayHour}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
+  // Helper function to convert time string to minutes since midnight
+  const timeToMinutes = (timeString) => {
+    if (!timeString) return 0;
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  // Update time from slider
+  const updateTimeFromSlider = (totalMinutes) => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const newTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    setTempTime(newTime);
   };
 
   const handleAddTask = () => {
@@ -193,7 +225,7 @@ const TaskInput = ({ onAddTask }) => {
     // Reset form
     setTitle('');
     setDuration('');
-    setStartTime('09:00');
+    setStartTime('');
     setSelectedTags([]);
     setProductivityLevel('medium');
   };
@@ -235,7 +267,10 @@ const TaskInput = ({ onAddTask }) => {
             style={styles.timeDisplay} 
             onPress={openTimeModal}
           >
-            <Text style={styles.timeDisplayText}>
+            <Text style={[
+              styles.timeDisplayText,
+              !startTime && styles.placeholderText
+            ]}>
               {getCurrentDisplayTime()}
             </Text>
           </TouchableOpacity>
@@ -290,78 +325,29 @@ const TaskInput = ({ onAddTask }) => {
                   {/* Time Picker based on platform */}
                   {Platform.OS === 'web' ? (
                     <View style={styles.webTimePicker}>
-                      {/* Hour Slider */}
-                      <View style={styles.timeSliderContainer}>
-                        <Text style={styles.timeSliderLabel}>Hour:</Text>
-                        <View style={styles.timeSliderRow}>
-                          <Text style={styles.timeSliderValue}>
-                            {timeToNumbers(tempTime).hours}
+                      <View style={styles.timePickerContent}>
+                        {/* Time Display */}
+                        <View style={styles.timeDisplayContainer}>
+                          <Text style={styles.timeValue}>
+                            {minutesToTime(timeToMinutes(tempTime))}
                           </Text>
+                        </View>
+                        
+                        {/* Single Time Slider */}
+                        <View style={styles.timeSliderContainer}>
                           <input
                             type="range"
                             min="0"
-                            max="23"
-                            value={timeToNumbers(tempTime).hours}
+                            max="1439"
+                            value={timeToMinutes(tempTime)}
                             onChange={(e) => {
-                              const hours = parseInt(e.target.value);
-                              updateTimeFromSliders(
-                                hours,
-                                timeToNumbers(tempTime).minutes
-                              );
+                              updateTimeFromSlider(parseInt(e.target.value));
                             }}
                             style={{
                               width: '100%',
-                              margin: '0 10px',
+                              margin: '20px 0',
                             }}
                           />
-                        </View>
-                      </View>
-                      
-                      {/* Minute Slider */}
-                      <View style={styles.timeSliderContainer}>
-                        <Text style={styles.timeSliderLabel}>Minute:</Text>
-                        <View style={styles.timeSliderRow}>
-                          <Text style={styles.timeSliderValue}>
-                            {timeToNumbers(tempTime).minutes}
-                          </Text>
-                          <input
-                            type="range"
-                            min="0"
-                            max="59"
-                            value={timeToNumbers(tempTime).minutes}
-                            onChange={(e) => {
-                              const minutes = parseInt(e.target.value);
-                              updateTimeFromSliders(
-                                timeToNumbers(tempTime).hours,
-                                minutes
-                              );
-                            }}
-                            style={{
-                              width: '100%',
-                              margin: '0 10px',
-                            }}
-                          />
-                        </View>
-                      </View>
-                      
-                      {/* Common Time Presets */}
-                      <View style={styles.timePresets}>
-                        <Text style={styles.timePresetsLabel}>Quick Select:</Text>
-                        <View style={styles.timePresetsRow}>
-                          {['09:00', '12:00', '15:00', '18:00'].map(time => (
-                            <TouchableOpacity
-                              key={time}
-                              style={[
-                                styles.timePreset,
-                                tempTime === time && styles.activeTimePreset
-                              ]}
-                              onPress={() => setTempTime(time)}
-                            >
-                              <Text style={styles.timePresetText}>
-                                {timeFormat === '12h' ? getDisplayTime(time) : time}
-                              </Text>
-                            </TouchableOpacity>
-                          ))}
                         </View>
                       </View>
                     </View>
@@ -550,6 +536,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.black,
   },
+  placeholderText: {
+    color: COLORS.secondaryDark,
+  },
   formatToggleButton: {
     backgroundColor: COLORS.secondaryLight,
     paddingVertical: 10,
@@ -620,62 +609,28 @@ const styles = StyleSheet.create({
   // Web Time Picker Styles
   webTimePicker: {
     width: '100%',
-  },
-  timeSliderContainer: {
-    marginBottom: 15,
-  },
-  timeSliderLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: COLORS.secondaryDark,
-    marginBottom: 5,
-  },
-  timeSliderRow: {
-    flexDirection: 'row',
     alignItems: 'center',
   },
-  timeSliderValue: {
-    width: 35,
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.primary,
+  timePickerContent: {
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
-  
-  // Time Presets
-  timePresets: {
-    marginTop: 10,
+  timeDisplayContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 10,
   },
-  timePresetsLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: COLORS.secondaryDark,
-    marginBottom: 8,
+  timeValue: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    textAlign: 'center',
   },
-  timePresetsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  timePreset: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
-    backgroundColor: COLORS.secondaryLight,
-    borderWidth: 1,
-    borderColor: COLORS.secondary,
-  },
-  activeTimePreset: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  timePresetText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.secondaryDark,
+  timeSliderContainer: {
+    width: '100%',
+    marginBottom: 20,
   },
   
   // Manual Time Input
