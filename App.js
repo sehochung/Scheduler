@@ -6,7 +6,6 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
-  TouchableOpacity
 } from 'react-native';
 
 // Import main CSS file
@@ -17,23 +16,18 @@ import COLORS from './src/colors';
 
 // Import components from their respective folders
 import TaskInput from './src/components/TaskInput';
-import SuggestionPanel from './src/components/SuggestionPanel';
-import MoodTracker from './src/components/MoodTracker';
-import ScheduleSharing from './src/components/ScheduleSharing';
-import DailyAnalysis from './src/components/DailyAnalysis';
 import DailySchedule from './src/components/DailySchedule';
 
 export default function App() {
-  console.log('App component rendering');
   const [tasks, setTasks] = useState([]);
-  const [dailyMood, setDailyMood] = useState({});
-  const [analysis, setAnalysis] = useState(null);
-  const [showBasicView, setShowBasicView] = useState(false); // Show full app view
   
-  // Process tasks for DailySchedule component by formatting them properly
+  // Process tasks for DailySchedule component
   const processedTasks = React.useMemo(() => {
+    if (!tasks || tasks.length === 0) return [];
+    
     return tasks.map(task => {
-      // Convert ISO date string to 12-hour format (e.g. "12:00 AM")
+      if (!task) return null;
+      
       let startTimeFormatted = 'Unknown time';
       
       try {
@@ -49,7 +43,7 @@ export default function App() {
         console.error('Error formatting time:', error);
       }
       
-      // Assign a color based on task tags or productivity level
+      // Assign a color based on task tags
       let color = COLORS.primary;
       if (task.tags && task.tags.length > 0) {
         if (task.tags.includes('work')) color = COLORS.primary;
@@ -57,18 +51,18 @@ export default function App() {
         else if (task.tags.includes('health')) color = '#E91E63';
         else if (task.tags.includes('meeting')) color = '#FF9800';
         else if (task.tags.includes('learning')) color = '#00BCD4';
-      } else if (task.productivityLevel) {
-        if (task.productivityLevel === 'high') color = COLORS.success;
-        else if (task.productivityLevel === 'low') color = COLORS.danger;
       }
       
+      // Make sure we're returning a properly formatted task object
       return {
-        name: task.title,
+        id: task.id,
+        name: task.title || 'Untitled Task',
+        title: task.title || 'Untitled Task', // Include both name and title for flexibility
         startTime: startTimeFormatted,
-        duration: task.duration,
+        duration: parseInt(task.duration, 10) || 30, // Ensure duration is a number with fallback
         color: color
       };
-    });
+    }).filter(Boolean); // Filter out any null values
   }, [tasks]);
 
   // Process a new task and check for overlaps before adding
@@ -156,62 +150,6 @@ export default function App() {
     return true;
   };
 
-  const analyzeDailyPerformance = () => {
-    // Generate insights based on completed tasks and mood data
-
-    // Determine schedule category based on tasks
-    let workCount = 0;
-    let leisureCount = 0;
-    let grindCount = 0;
-
-    tasks.forEach(task => {
-      if (task.tags && task.tags.includes('work')) workCount++;
-      if (task.tags && task.tags.includes('leisure')) leisureCount++;
-      if (task.tags && task.tags.includes('grind')) grindCount++;
-    });
-
-    // Determine primary schedule category
-    let scheduleCategory = 'balanced';
-    if (workCount > leisureCount && workCount > grindCount) {
-      scheduleCategory = 'work-focused';
-    } else if (leisureCount > workCount && leisureCount > grindCount) {
-      scheduleCategory = 'leisure-focused';
-    } else if (grindCount > workCount && grindCount > leisureCount) {
-      scheduleCategory = 'grind-focused';
-    }
-
-    setAnalysis({
-      productivityScore: 85,
-      moodTrends: 'Positive after exercise tasks',
-      suggestions: ['Schedule more morning exercise', 'Take breaks between long tasks'],
-      scheduleCategory: scheduleCategory
-    });
-  };
-
-  // Simple test view to check if basic components render
-  if (showBasicView) {
-    return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f0f0' }}>
-        <View style={{ padding: 20, alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-          <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Basic Test View</Text>
-          <Text style={{ fontSize: 16, marginBottom: 10 }}>If you can see this, the app is rendering correctly</Text>
-          <TouchableOpacity
-            onPress={() => setShowBasicView(false)}
-            style={{
-              backgroundColor: 'blue',
-              padding: 10,
-              borderRadius: 5,
-              marginTop: 20
-            }}
-          >
-            <Text style={{ color: 'white' }}>Show Full App</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // Full app view
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -219,39 +157,14 @@ export default function App() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        <Text style={styles.appTitle}>Schedule Bot</Text>
+        <Text style={styles.appTitle}>Smart Scheduler</Text>
 
-        <DailySchedule
-          tasks={processedTasks}
-        />
-
-        <TaskInput
-          onAddTask={addTask}
-        />
-
-        <SuggestionPanel
-          tasks={tasks}
-        />
-
-        <MoodTracker
-          onMoodUpdate={setDailyMood}
-          tasks={tasks}
-        />
-
-
-
-        <DailyAnalysis
-          analysis={analysis}
-          onAnalyze={analyzeDailyPerformance}
-        />
-
-        <ScheduleSharing
-          schedule={tasks}
-        />
+        <DailySchedule tasks={processedTasks} />
+        <TaskInput onAddTask={addTask} />
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Schedule better, live smarter
+            Plan smarter, achieve more
           </Text>
         </View>
       </ScrollView>

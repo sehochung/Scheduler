@@ -5,8 +5,9 @@ import '../../../src/styles/components/DailySchedule.css';
 
 // Constants for timeline calculations - defined outside component for StyleSheet access
 const TOTAL_MINUTES_IN_DAY = 24 * 60; // 24 hours = 1440 minutes
-const MINUTES_PER_PIXEL = 2; // 1 minute = 2 pixels height
-const DEFAULT_MIN_TIMELINE_HEIGHT = 400; // Minimum height when tasks exist
+const PIXELS_PER_HOUR = 60; // 60 pixels per hour
+const MINUTES_PER_HOUR = 60;
+const DEFAULT_MIN_TIMELINE_HEIGHT = 600; // Minimum height when tasks exist
 const PADDING_HOURS = 2; // Add 2 hours padding before first task and after last task
 
 const DailySchedule = ({ tasks = [] }) => {
@@ -49,7 +50,6 @@ const DailySchedule = ({ tasks = [] }) => {
   
   /**
    * Converts minutes since midnight to a vertical position in pixels
-   * relative to the dynamic range's start time
    * @param {number} minutes - Minutes since midnight
    * @param {number} startMinutes - Start minutes of the range
    * @return {number} Vertical position in pixels
@@ -57,14 +57,11 @@ const DailySchedule = ({ tasks = [] }) => {
   const getVerticalPosition = (minutes, startMinutes) => {
     if (!minutes || isNaN(minutes)) return 0;
     
-    // Calculate position relative to the range start
+    // Calculate position using same scaling as duration
     const relativeMinutes = minutes - startMinutes;
+    const position = (relativeMinutes / MINUTES_PER_HOUR) * PIXELS_PER_HOUR;
     
-    // Convert minutes to pixels (default is MINUTES_PER_PIXEL)
-    const position = relativeMinutes / MINUTES_PER_PIXEL;
-    
-    // Ensure position is not negative (shouldn't happen with our range calculation)
-    return Math.max(position, 0);
+    return Math.max(Math.round(position), 0);
   };
   
   /**
@@ -73,13 +70,13 @@ const DailySchedule = ({ tasks = [] }) => {
    * @return {number} Height in pixels
    */
   const getDurationHeight = (durationMinutes) => {
-    if (!durationMinutes || isNaN(durationMinutes)) return 30; // Default minimum height
+    if (!durationMinutes || isNaN(durationMinutes)) return 24; // Minimum default height
     
-    // Convert duration to height using our pixel ratio
-    const height = durationMinutes / MINUTES_PER_PIXEL;
+    // Linear scaling: 1 minute = 1 pixel
+    const height = (durationMinutes / MINUTES_PER_HOUR) * PIXELS_PER_HOUR;
     
-    // Ensure height is reasonable (minimum 30px for visibility)
-    return Math.max(height, 30);
+    // Round to nearest pixel, minimum height of 24px for visibility
+    return Math.max(Math.round(height), 24);
   };
   
   /**
@@ -183,9 +180,9 @@ const DailySchedule = ({ tasks = [] }) => {
       const minRangeMinutes = 4 * 60;
       const rangeInMinutes = Math.max(latestEndMinutes - startMinutes, minRangeMinutes);
       
-      // Calculate timeline height based on range (1 minute = MINUTES_PER_PIXEL pixels)
+      // Calculate timeline height using exact hour scaling for perfect alignment
       const timelineHeight = Math.max(
-        rangeInMinutes / MINUTES_PER_PIXEL,
+        Math.round((rangeInMinutes / 60) * PIXELS_PER_HOUR),
         DEFAULT_MIN_TIMELINE_HEIGHT
       );
       
@@ -194,20 +191,40 @@ const DailySchedule = ({ tasks = [] }) => {
       const startHour = Math.floor(startMinutes / 60);
       const endHour = Math.ceil(latestEndMinutes / 60);
       
+      // Add hour markers (and half-hour markers for better readability)
       for (let hour = startHour; hour <= endHour; hour++) {
+        // Full hour marker
         const hourInMinutes = hour * 60;
         const relativePosition = hourInMinutes - startMinutes; // Position relative to our start
-        const position = relativePosition / MINUTES_PER_PIXEL;
+        // Calculate position using exact hour scaling for pixel-perfect alignment
+        const position = Math.round((relativePosition / 60) * PIXELS_PER_HOUR);
         
         if (position >= 0) { // Only include hours within our range
           hourMarkers.push({
             hour,
-            position, 
+            position,
+            isHalfHour: false,
             label: hour === 0 || hour === 24 ? '12:00 AM' : 
                    hour === 12 ? '12:00 PM' : 
                    hour > 12 ? `${hour-12}:00 PM` : 
                    `${hour}:00 AM`
           });
+          
+          // Add half-hour marker if it's within our range
+          const halfHourInMinutes = hourInMinutes + 30;
+          const halfHourRelativePosition = halfHourInMinutes - startMinutes;
+          // Calculate half-hour position using exact hour scaling
+          const halfHourPosition = Math.round((halfHourRelativePosition / 60) * PIXELS_PER_HOUR);
+          
+          if (halfHourPosition >= 0 && halfHourPosition <= timelineHeight && hour < endHour) {
+            const displayHour = hour === 0 || hour === 24 ? 12 : (hour > 12 ? hour-12 : hour);
+            hourMarkers.push({
+              hour: hour + 0.5,
+              position: halfHourPosition,
+              isHalfHour: true,
+              label: `${displayHour}:30 ${hour >= 12 && hour < 24 ? 'PM' : 'AM'}`
+            });
+          }
         }
       }
       
@@ -261,10 +278,12 @@ const DailySchedule = ({ tasks = [] }) => {
                   {hourMarkers.map((marker, i) => (
                     <div 
                       key={i} 
-                      className="hour-marker"
+                      className={`hour-marker ${marker.isHalfHour ? 'half-hour-marker' : 'full-hour-marker'}`}
                       style={{ top: `${marker.position}px` }}
                     >
-                      <span className="hour-label">{marker.label}</span>
+                      <span className={`hour-label ${marker.isHalfHour ? 'half-hour-label' : 'full-hour-label'}`}>
+                        {marker.label}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -275,7 +294,7 @@ const DailySchedule = ({ tasks = [] }) => {
                   {hourMarkers.map((marker, i) => (
                     <div
                       key={`grid-${i}`}
-                      className="hour-grid-line"
+                      className={`hour-grid-line ${marker.isHalfHour ? 'half-hour-grid-line' : 'full-hour-grid-line'}`}
                       style={{ top: `${marker.position}px` }}
                     />
                   ))}
@@ -293,31 +312,53 @@ const DailySchedule = ({ tasks = [] }) => {
                       const topPosition = getVerticalPosition(taskStartMinutes, startMinutes);
                       const height = getDurationHeight(parseInt(task.duration, 10) || 30);
                       
-                      console.log('Rendering task:', { // Debug log
+                      // For debugging
+                      console.log('Rendering task:', { 
                         index,
-                        title: task.title || task.name,
+                        id: task.id,
+                        name: task.name,
+                        title: task.title,
                         startTime: task.startTime,
                         duration: task.duration,
                         topPosition,
                         height
                       });
                       
+                      // Ensure text data is available
+                      const taskTitle = task.title || task.name || 'Untitled Task';
+                      const taskStartTime = task.startTime || 'No time set';
+                      const taskDuration = task.duration ? `${task.duration} min` : 'No duration';
+                      
+                      // Check if the task block is too small for two lines of text
+                      const isCompactView = height < 50;  // 50px threshold for compact view
+
                       return (
                         <div
-                          key={index}
-                          className="task-block"
+                          key={task.id || index}
+                          className={`task-block ${isCompactView ? 'task-block-compact' : ''}`}
                           style={{
                             top: `${topPosition}px`,
                             height: `${height}px`,
                             backgroundColor: task.color || COLORS.primary,
+                            zIndex: 10 // Ensure task blocks are above grid lines
                           }}
                         >
-                          <div className="task-title">
-                            {task.title || task.name || 'Untitled Task'}
-                          </div>
-                          <div className="task-details">
-                            {task.startTime} • {task.duration} min
-                          </div>
+                          {isCompactView ? (
+                            // Compact view: all info on one line with ellipsis
+                            <div className="task-compact-content">
+                              {taskTitle} • {taskStartTime} • {taskDuration}
+                            </div>
+                          ) : (
+                            // Regular view: title and details on separate lines
+                            <>
+                              <div className="task-title">
+                                {taskTitle}
+                              </div>
+                              <div className="task-details">
+                                {taskStartTime} • {taskDuration}
+                              </div>
+                            </>
+                          )}
                         </div>
                       );
                     } catch (error) {
@@ -348,11 +389,24 @@ const DailySchedule = ({ tasks = [] }) => {
                       key={i} 
                       style={[
                         styles.hourMarker,
+                        marker.isHalfHour ? styles.halfHourMarker : styles.fullHourMarker,
                         { top: marker.position }
                       ]}
                     >
-                      <Text style={styles.hourLabel}>{marker.label}</Text>
-                      <View style={styles.hourLine} />
+                      <Text 
+                        style={[
+                          styles.hourLabel,
+                          marker.isHalfHour ? styles.halfHourLabel : styles.fullHourLabel
+                        ]}
+                      >
+                        {marker.label}
+                      </Text>
+                      <View 
+                        style={[
+                          styles.hourLine,
+                          marker.isHalfHour ? styles.halfHourLine : styles.fullHourLine
+                        ]} 
+                      />
                     </View>
                   ))}
                 </View>
@@ -370,9 +424,17 @@ const DailySchedule = ({ tasks = [] }) => {
                       const duration = parseInt(task.duration, 10) || 30;
                       const height = getDurationHeight(duration);
                       
+                      // Ensure text data is available
+                      const taskTitle = task.title || task.name || 'Untitled Task';
+                      const taskStartTime = task.startTime || 'No time set';
+                      const taskDuration = task.duration ? `${task.duration} min` : 'No duration';
+                      
+                      // Check if the task block is too small for two lines of text
+                      const isCompactView = height < 50;  // 50px threshold for compact view
+                      
                       return (
                         <View
-                          key={index}
+                          key={task.id || index}
                           style={[
                             styles.taskBlock,
                             {
@@ -381,17 +443,28 @@ const DailySchedule = ({ tasks = [] }) => {
                               height: height,
                               left: 0,
                               right: 0,
-                              backgroundColor: task.color || COLORS.primary
+                              backgroundColor: task.color || COLORS.primary,
+                              zIndex: 10, // Ensure task blocks appear above grid lines
+                              justifyContent: 'center' // Center content vertically
                             }
                           ]}
                         >
-                          {/* Make sure to always render task name */}
-                          <Text style={styles.taskTitle} numberOfLines={1}>
-                            {task.name || 'Untitled Task'}
-                          </Text>
-                          <Text style={styles.taskDuration}>
-                            {task.startTime} • {task.duration || 0} min
-                          </Text>
+                          {isCompactView ? (
+                            // Compact view: single line with all information
+                            <Text style={styles.taskCompactText} numberOfLines={1} ellipsizeMode="tail">
+                              {taskTitle} • {taskStartTime} • {taskDuration}
+                            </Text>
+                          ) : (
+                            // Regular view: title and details on separate lines
+                            <>
+                              <Text style={styles.taskTitle} numberOfLines={1}>
+                                {taskTitle}
+                              </Text>
+                              <Text style={styles.taskDuration}>
+                                {taskStartTime} • {taskDuration}
+                              </Text>
+                            </>
+                          )}
                         </View>
                       );
                     } catch (error) {
@@ -445,7 +518,7 @@ const styles = StyleSheet.create({
   
   // Mobile-specific styles for vertical timeline
   mobileTimeline: {
-    height: 500, // Fixed height with scroll
+    height: 600, // Increased fixed height with scroll
     marginVertical: 10,
   },
   timelineContent: {
@@ -453,36 +526,68 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   hourMarkersContainer: {
-    width: 60,
+    width: 80, // Increased width for better readability
     position: 'absolute',
     top: 0,
     left: 0,
     bottom: 0,
     borderRightWidth: 1,
     borderRightColor: COLORS.secondary,
+    backgroundColor: '#f8f8f8', // Light background for time markers
   },
   hourMarker: {
     position: 'absolute',
     left: 0,
-    width: 60,
+    width: 80,
     alignItems: 'flex-start',
   },
+  fullHourMarker: {
+    height: 2,
+    backgroundColor: COLORS.secondaryLight,
+    zIndex: 2,
+  },
+  halfHourMarker: {
+    height: 1,
+    backgroundColor: 'transparent',
+    zIndex: 1,
+  },
   hourLabel: {
+    marginLeft: 10,
+    transform: [{ translateY: -8 }], // Adjust for vertical alignment
+    color: COLORS.secondaryDark,
+  },
+  fullHourLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: COLORS.secondaryDark,
+  },
+  halfHourLabel: {
     fontSize: 10,
     color: COLORS.secondaryDark,
-    marginLeft: 5,
+    opacity: 0.7,
   },
   hourLine: {
     position: 'absolute',
-    left: 60,
+    left: 80,
     right: -500, // Extend across timeline
+  },
+  fullHourLine: {
     height: 1,
-    backgroundColor: 'rgba(0,0,0,0.05)',
+    backgroundColor: 'rgba(0,0,0,0.08)',
+    zIndex: 2,
+  },
+  halfHourLine: {
+    height: 1,
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.04)',
+    borderStyle: 'dotted',
+    zIndex: 1,
   },
   taskBlocksContainer: {
     position: 'absolute',
     top: 0,
-    left: 70, // Offset from hour markers
+    left: 90, // Offset from hour markers (increased to match wider time column)
     right: 10,
     bottom: 0,
   },
@@ -501,6 +606,15 @@ const styles = StyleSheet.create({
     fontSize: 10,
     opacity: 0.9,
     marginTop: 4,
+  },
+  taskCompactText: {
+    color: COLORS.white,
+    fontSize: 11,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });
 

@@ -1,27 +1,31 @@
-# Schedule Bot
+# Smart Scheduler
 
-A mobile app that helps users create, optimize, and track their daily schedules with intelligent personalized suggestions.
+A React Native app that helps users create and visualize their daily schedules.
 
-## Core Features
+## Current Features
 
-- **Simple, Effective UI** for schedule visualization
-- **Personalized Activity Suggestions** that improve with usage
-- **Schedule Optimization** for time-constrained periods
-- **Mood & Productivity Tracking** to identify effective patterns
-- **Activity Categorization** (leisure, work, grind mode)
-- **Schedule Sharing** with friends and family
-- **Paper Schedule Scanning** for digital conversion
-- **Daily Analysis** with productivity insights
-- **Gap Filling** with self-care suggestions
+- **Daily Schedule View**: Display tasks in a vertical timeline with time blocks
+- **Add New Task**: Add tasks with title, duration, and start time
+- **Activity Categorization**: Tag tasks (work, leisure, etc.) with color coding
 
 ## Technical Stack
 
 - Frontend: React Native with Expo
-- Future Backend: Node.js with Express
-- Future Database: MongoDB
-- Future ML: TensorFlow Lite for suggestion engine
-- Future OCR: Google Vision API for paper scanning
+
+## Cleanup Log
+
+The app has been cleaned up to focus on core functionality:
+
+- **Kept Components**: DailySchedule and TaskInput
+- **Simplified UI**: Focused on task management and visualization
 
 ## Target Outcome
 
-Help users execute their schedules effectively, not just create them. Optimize for productivity while maintaining wellbeing through smart suggestions.
+Help users create and visualize daily schedules effectively with a clean, focused interface.
+
+## Future Features (Planned)
+
+- Schedule Optimization
+- Personalized Activity Suggestions
+- Mood & Productivity Tracking
+- Schedule Sharing

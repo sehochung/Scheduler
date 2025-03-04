@@ -18,37 +18,59 @@
 }
 
 .hour-markers {
-  width: 60px; /* Fixed width for hour labels */
+  width: 80px; /* Widened for better visibility */
   position: relative;
   flex-shrink: 0;
-  border-right: 1px dashed #ccc;
+  border-right: 1px solid #ccc;
   margin-right: 10px;
+  background-color: #f8f8f8; /* Light background for time markers */
 }
 
 .hour-marker {
   position: absolute;
   left: 0;
-  width: 60px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.full-hour-marker {
+  height: 2px;
+  background-color: #ddd;
+  z-index: 2;
+}
+
+.half-hour-marker {
   height: 1px;
   background-color: #eee;
+  z-index: 1;
 }
 
 .hour-label {
   position: absolute;
-  left: 5px;
+  left: 10px;
   transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.full-hour-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #444;
+}
+
+.half-hour-label {
   font-size: 10px;
   color: #666;
-  white-space: nowrap;
 }
 
 .timeline {
   position: relative;
   flex-grow: 1;
   /* Dynamic height is set inline in the component */
-  min-height: 400px; /* Minimum height to avoid empty space */
-  background-color: #f0f0f0;
+  min-height: 600px; /* Increased minimum height */
+  background-color: #f5f5f5;
   border-radius: 4px;
+  border: 1px solid #e0e0e0;
 }
 
 .task-block {
@@ -69,6 +91,8 @@
   flex-direction: column;
   justify-content: center;
   border-left: 4px solid rgba(0, 0, 0, 0.2);
+  z-index: 10; /* Ensure tasks appear above grid lines by default */
+  min-height: 40px; /* Ensure minimum height for small tasks */
 }
 
 .task-block:hover {
@@ -84,6 +108,8 @@
   text-overflow: ellipsis;
   margin-bottom: 2px;
   white-space: nowrap; /* Prevent title from wrapping */
+  color: white; /* Ensure text is visible on colored backgrounds */
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3); /* Add subtle text shadow for readability */
 }
 
 .task-details {
@@ -93,6 +119,27 @@
   white-space: nowrap; /* Prevent details from wrapping */
   overflow: hidden;
   text-overflow: ellipsis;
+  color: white; /* Ensure text is visible on colored backgrounds */
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2); /* Add subtle text shadow for readability */
+}
+
+/* Compact view for small task blocks */
+.task-block-compact {
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+}
+
+.task-compact-content {
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  text-align: center;
 }
 
 /* Hour grid lines */
@@ -100,8 +147,19 @@
   position: absolute;
   left: 0;
   right: 0;
+}
+
+.full-hour-grid-line {
   height: 1px;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.08);
+  z-index: 2;
+}
+
+.half-hour-grid-line {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-top: 1px dotted rgba(0, 0, 0, 0.05);
+  z-index: 1;
 }
 
 /* Time range info */
