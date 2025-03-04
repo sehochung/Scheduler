@@ -256,6 +256,21 @@ const DailySchedule = ({ tasks = [] }) => {
     console.log("Rendered tasks:", sortedTasks);
   }, [sortedTasks]);
   
+  // Add this function near the top with other utility functions
+  const getThemeGradient = (duration) => {
+    const durationNum = parseInt(duration, 10);
+    // Create variations of the theme color #4A90E2
+    if (durationNum <= 30) {
+      return ['#5B9EE6', '#4A90E2']; // Lighter variation
+    } else if (durationNum <= 60) {
+      return ['#4A90E2', '#2171cd']; // Standard theme
+    } else if (durationNum <= 120) {
+      return ['#4A90E2', '#1a5aa3']; // Darker variation
+    } else {
+      return ['#4A90E2', '#154785']; // Deepest variation
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Daily Schedule</Text>
@@ -333,6 +348,7 @@ const DailySchedule = ({ tasks = [] }) => {
                       // Check if the task block is too small for two lines of text
                       const isCompactView = height < 60;  // 60px threshold for compact view (increased for new scale)
 
+                      const [gradientStart, gradientEnd] = getThemeGradient(task.duration);
                       return (
                         <div
                           key={task.id || index}
@@ -340,18 +356,32 @@ const DailySchedule = ({ tasks = [] }) => {
                           style={{
                             top: `${topPosition}px`,
                             height: `${height}px`,
-                            backgroundColor: task.color || COLORS.primary,
-                            zIndex: 10 // Ensure task blocks are above grid lines
+                            background: task.color ? 
+                              `linear-gradient(135deg, ${task.color} 0%, ${task.color}dd 100%)` :
+                              `linear-gradient(135deg, ${gradientStart} 0%, ${gradientEnd} 100%)`,
+                            zIndex: 10
                           }}
                         >
+                          <div
+                            style={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              width: '100%',
+                              height: '2px',
+                              background: 'rgba(255, 255, 255, 0.3)',
+                              borderRadius: '1px'
+                            }}
+                          />
                           {isCompactView ? (
-                            // Compact view: split the content into bold and normal parts
                             <div className="task-compact-content">
-                              <span style={{ fontWeight: 'bold' }}>{taskTitle}</span>
-                              <span className="task-time-info"> • {taskStartTime} • {taskDuration}</span>
+                              <span style={{ fontWeight: '600' }}>{taskTitle}</span>
+                              <span className="task-time-info">•</span>
+                              <span className="task-time-info">{taskStartTime}</span>
+                              <span className="task-time-info">•</span>
+                              <span className="task-time-info">{taskDuration}</span>
                             </div>
                           ) : (
-                            // Regular view: title and details on separate lines
                             <>
                               <div className="task-title">
                                 {taskTitle}
@@ -434,6 +464,7 @@ const DailySchedule = ({ tasks = [] }) => {
                       // Check if the task block is too small for two lines of text
                       const isCompactView = height < 60;  // 60px threshold for compact view (increased for new scale)
                       
+                      const [gradientStart, gradientEnd] = getThemeGradient(task.duration);
                       return (
                         <View
                           key={task.id || index}
@@ -445,12 +476,25 @@ const DailySchedule = ({ tasks = [] }) => {
                               height: height,
                               left: 0,
                               right: 0,
-                              backgroundColor: task.color || COLORS.primary,
+                              background: task.color ? 
+                                `linear-gradient(135deg, ${task.color} 0%, ${task.color}dd 100%)` :
+                                `linear-gradient(135deg, ${gradientStart} 0%, ${gradientEnd} 100%)`,
                               zIndex: 10, // Ensure task blocks appear above grid lines
                               justifyContent: 'center' // Center content vertically
                             }
                           ]}
                         >
+                          <div
+                            style={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              width: '100%',
+                              height: '2px',
+                              background: 'rgba(255, 255, 255, 0.3)',
+                              borderRadius: '1px'
+                            }}
+                          />
                           {isCompactView ? (
                             // Compact view: single line with all information
                             <Text style={styles.taskCompactText} numberOfLines={1} ellipsizeMode="tail">
