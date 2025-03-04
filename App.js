@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  SafeAreaView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
   StatusBar,
   ScrollView,
   TouchableOpacity
@@ -33,18 +33,18 @@ export default function App() {
 
   const analyzeDailyPerformance = () => {
     // Generate insights based on completed tasks and mood data
-    
+
     // Determine schedule category based on tasks
     let workCount = 0;
     let leisureCount = 0;
     let grindCount = 0;
-    
+
     tasks.forEach(task => {
       if (task.tags && task.tags.includes('work')) workCount++;
       if (task.tags && task.tags.includes('leisure')) leisureCount++;
       if (task.tags && task.tags.includes('grind')) grindCount++;
     });
-    
+
     // Determine primary schedule category
     let scheduleCategory = 'balanced';
     if (workCount > leisureCount && workCount > grindCount) {
@@ -54,7 +54,7 @@ export default function App() {
     } else if (grindCount > workCount && grindCount > leisureCount) {
       scheduleCategory = 'grind-focused';
     }
-    
+
     setAnalysis({
       productivityScore: 85,
       moodTrends: 'Positive after exercise tasks',
@@ -66,11 +66,11 @@ export default function App() {
   // Simple test view to check if basic components render
   if (showBasicView) {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: '#f0f0f0'}}>
-        <View style={{padding: 20, alignItems: 'center', justifyContent: 'center', flex: 1}}>
-          <Text style={{fontSize: 24, fontWeight: 'bold', marginBottom: 20}}>Basic Test View</Text>
-          <Text style={{fontSize: 16, marginBottom: 10}}>If you can see this, the app is rendering correctly</Text>
-          <TouchableOpacity 
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f0f0' }}>
+        <View style={{ padding: 20, alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+          <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Basic Test View</Text>
+          <Text style={{ fontSize: 16, marginBottom: 10 }}>If you can see this, the app is rendering correctly</Text>
+          <TouchableOpacity
             onPress={() => setShowBasicView(false)}
             style={{
               backgroundColor: 'blue',
@@ -79,7 +79,7 @@ export default function App() {
               marginTop: 20
             }}
           >
-            <Text style={{color: 'white'}}>Show Full App</Text>
+            <Text style={{ color: 'white' }}>Show Full App</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -90,38 +90,40 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
         <Text style={styles.appTitle}>Schedule Bot</Text>
-        
-        <Schedule 
+
+        <Schedule
           tasks={tasks}
         />
-        
-        <TaskInput 
+
+        <TaskInput
           onAddTask={addTask}
         />
-        
-        <SuggestionPanel 
+
+        <SuggestionPanel
           tasks={tasks}
         />
-        
-        <MoodTracker 
+
+        <MoodTracker
           onMoodUpdate={setDailyMood}
           tasks={tasks}
         />
-        
-        <ScheduleSharing 
-          schedule={tasks} 
-        />
-        
-        <DailyAnalysis 
-          analysis={analysis} 
+
+
+
+        <DailyAnalysis
+          analysis={analysis}
           onAnalyze={analyzeDailyPerformance}
         />
-        
+
+        <ScheduleSharing
+          schedule={tasks}
+        />
+
         <View style={styles.footer}>
           <Text style={styles.footerText}>
             Schedule better, live smarter
