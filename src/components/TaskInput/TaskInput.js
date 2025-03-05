@@ -5,12 +5,23 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import COLORS from '../../colors';
 import '../../../src/styles/components/TaskInput.css';
 
-const TaskInput = ({ onAddTask }) => {
-  const [title, setTitle] = useState('');
+const TaskInput = ({ onAddTask, initialTitle = '', onTitleUsed }) => {
+  const [title, setTitle] = useState(initialTitle);
   const [duration, setDuration] = useState('');
   const [startTime, setStartTime] = useState('');
   const [productivityLevel, setProductivityLevel] = useState('medium');
   const [selectedTags, setSelectedTags] = useState([]);
+  
+  // Update title when initialTitle prop changes
+  React.useEffect(() => {
+    if (initialTitle && initialTitle !== title) {
+      setTitle(initialTitle);
+      // Notify the parent that we've used the title
+      if (onTitleUsed) {
+        onTitleUsed();
+      }
+    }
+  }, [initialTitle, onTitleUsed]);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [timeInputMode, setTimeInputMode] = useState('picker'); // 'picker' or 'text'
   const [timeInputText, setTimeInputText] = useState('');
@@ -234,7 +245,7 @@ const TaskInput = ({ onAddTask }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="task-input-container">
       <Text style={styles.title}>Add New Task</Text>
       
       <View style={styles.inputRow}>

@@ -1,6 +1,7 @@
 /* Main stylesheet */
 @import './components/TaskInput.css';
 @import './components/DailySchedule.css';
+@import './components/ThingsToAccomplish.css';
 
 /* Base styles */
 body {

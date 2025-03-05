@@ -17,9 +17,11 @@ import COLORS from './src/colors';
 // Import components from their respective folders
 import TaskInput from './src/components/TaskInput';
 import DailySchedule from './src/components/DailySchedule';
+import ThingsToAccomplish from './src/components/ThingsToAccomplish';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
+  const [prefilledTaskTitle, setPrefilledTaskTitle] = useState('');
   
   // Process tasks for DailySchedule component
   const processedTasks = React.useMemo(() => {
@@ -158,9 +160,25 @@ export default function App() {
         contentContainerStyle={styles.scrollContent}
       >
         <Text style={styles.appTitle}>Smart Scheduler</Text>
-
+        <ThingsToAccomplish onTaskSelect={(title) => {
+          // Pre-fill TaskInput when a to-do item is clicked
+          setPrefilledTaskTitle(title);
+          
+          // Scroll to the TaskInput component (simplified - in a real app you would use a ref)
+          setTimeout(() => {
+            const taskInputElement = document.querySelector('.task-input-container');
+            if (taskInputElement) {
+              taskInputElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
+        }} />
+        
+        <TaskInput 
+          onAddTask={addTask} 
+          initialTitle={prefilledTaskTitle}
+          onTitleUsed={() => setPrefilledTaskTitle('')}
+        />
         <DailySchedule tasks={processedTasks} />
-        <TaskInput onAddTask={addTask} />
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
